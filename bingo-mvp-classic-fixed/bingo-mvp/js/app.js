@@ -1,3 +1,4 @@
+
 /* Simple Multiplayer Bingo MVP
    Plain HTML/CSS/JS.
    Firebase Realtime Database when configured; local demo mode otherwise.
