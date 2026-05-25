@@ -426,5 +426,4 @@ function renderRoom() {
 window.addEventListener('load', () => {
   renderHome();
 });
-```
 
