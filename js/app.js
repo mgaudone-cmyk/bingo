@@ -370,19 +370,25 @@ function joinRoomView(roomCode, replace = false) {
 }
 
 async function startGame() {
-  if (!state.room || !state.player) {
-    return setError("Player not connected to room.");
-  }
+  try {
+    if (!state.room) {
+      alert("No room loaded.");
+      return;
+    }
 
-  if (!amHost(state.room)) {
-    return setError("Only the host can start the game.");
-  }
+    await store.updateRoom(state.roomCode, {
+      status: "playing",
+      winner: null,
+      hostId: uid,
+      updatedAt: Date.now()
+    });
 
-  await store.updateRoom(state.roomCode, {
-    status: "playing",
-    winner: null,
-    hostId: uid
-  });
+    state.room.status = "playing";
+    renderGame();
+  } catch (err) {
+    alert("Start game failed: " + err.message);
+    console.error(err);
+  }
 }
 
 async function callNext() {
