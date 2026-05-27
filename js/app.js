@@ -371,26 +371,52 @@ function joinRoomView(roomCode, replace = false) {
 
 async function startGame() {
   try {
-    if (!state.room) {
-      alert("No room loaded.");
-      return;
+    const room = state.room;
+
+    if (!room) {
+      return setError("No room loaded.");
+    }
+
+    const fixedPool = Array.isArray(room.pool)
+      ? room.pool
+      : NUMBER_POOL;
+
+    const fixedCalled = Array.isArray(room.called)
+      ? room.called
+      : [];
+
+    if (!room.players || !room.players[uid]) {
+      return setError("Player not connected to room.");
     }
 
     await store.updateRoom(state.roomCode, {
       status: "playing",
       winner: null,
-      hostId: uid,
-      updatedAt: Date.now()
+      hostId: room.hostId || uid,
+      pool: fixedPool,
+      called: fixedCalled,
+      current: room.current || "",
+      mode: room.mode || "one",
+      cardType: room.cardType || "numbers"
     });
 
-    state.room.status = "playing";
+    state.room = {
+      ...room,
+      status: "playing",
+      pool: fixedPool,
+      called: fixedCalled,
+      current: room.current || "",
+      mode: room.mode || "one",
+      cardType: room.cardType || "numbers"
+    };
+
     renderGame();
-  } catch (err) {
-    alert("Start game failed: " + err.message);
-    console.error(err);
+
+  } catch (e) {
+    alert("Start game failed: " + e.message);
+    console.error(e);
   }
 }
-
 async function callNext() {
   const room = state.room;
   const remaining = room.pool.filter(x => !room.called.includes(x));
